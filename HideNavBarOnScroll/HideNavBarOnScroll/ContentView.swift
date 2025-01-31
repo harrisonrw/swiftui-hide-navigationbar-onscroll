@@ -26,6 +26,33 @@ struct ContentView: View {
             }
             .navigationTitle("Item List")
             .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .topBarLeading) {
+                    Button {
+                        
+                    } label: {
+                        Image(systemName: "person.circle.fill")
+                            .foregroundStyle(.white)
+                            .font(.system(size: 24))
+                    }
+                }
+                
+                ToolbarItem(placement: .principal) {
+                    Text("Item List")
+                        .foregroundStyle(.white)
+                        .font(.system(size: 20, weight: .bold))
+                }
+                
+                ToolbarItem(placement: .topBarTrailing) {
+                    Button {
+                        
+                    } label: {
+                        Image(systemName: "plus.circle.fill")
+                            .foregroundStyle(.white)
+                            .font(.system(size: 24))
+                    }
+                }
+            }
         }
     }
 }
