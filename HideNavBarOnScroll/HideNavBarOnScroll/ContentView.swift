@@ -8,14 +8,25 @@
 import SwiftUI
 
 struct ContentView: View {
+    @State private var items: [UUID] = (1...100).compactMap { _ in UUID() }
+    
     var body: some View {
-        VStack {
-            Image(systemName: "globe")
-                .imageScale(.large)
-                .foregroundStyle(.tint)
-            Text("Hello, world!")
+        NavigationStack {
+            ZStack {
+                Color.pink
+                    .edgesIgnoringSafeArea(.all)
+                
+                ScrollView {
+                    LazyVStack {
+                        ForEach(items, id: \.self) { item in
+                            ItemView(item: item)
+                        }
+                    }
+                }
+            }
+            .navigationTitle("Item List")
+            .navigationBarTitleDisplayMode(.inline)
         }
-        .padding()
     }
 }
 
