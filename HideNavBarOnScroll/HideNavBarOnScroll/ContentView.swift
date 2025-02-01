@@ -9,7 +9,9 @@ import SwiftUI
 
 struct ContentView: View {
     @State private var items: [UUID] = (1...100).compactMap { _ in UUID() }
-    @State private var isScrolling = false
+    
+    @State private var toolbarVisibility: Visibility = .visible
+    @State private var lastContentOffset: CGFloat = 0.0
     
     var body: some View {
         NavigationStack {
@@ -25,15 +27,28 @@ struct ContentView: View {
                     }
                     .scrollTargetLayout()
                 }
-                .onScrollPhaseChange{ _, newPhase in
-                    withAnimation {
-                        switch newPhase {
-                        case .idle:
-                            isScrolling = false
-                        case .tracking, .interacting, .decelerating, .animating:
-                            isScrolling = true
+                .onScrollPhaseChange { oldPhase, newPhase, context in
+                    let currentOffset = context.geometry.contentOffset.y
+                    let isScrollingDown = currentOffset > lastContentOffset
+                    
+                    switch newPhase {
+                    case .interacting, .tracking:
+                        break
+                    case .animating, .decelerating:
+                        if oldPhase == .interacting || oldPhase == .tracking {
+                            withAnimation(.easeInOut(duration: 0.2)) {
+                                toolbarVisibility = isScrollingDown ? .hidden : .visible
+                            }
+                        }
+                    case .idle:
+                        if oldPhase != .idle && abs(currentOffset - lastContentOffset) > 20 {
+                            withAnimation(.easeInOut(duration: 0.2)) {
+                                toolbarVisibility = isScrollingDown ? .hidden : .visible
+                            }
                         }
                     }
+                    
+                    lastContentOffset = currentOffset
                 }
             }
             .navigationTitle("Item List")
@@ -65,7 +80,8 @@ struct ContentView: View {
                     }
                 }
             }
-            .toolbarVisibility(isScrolling ? .hidden : .visible, for: .navigationBar)
+            .toolbarVisibility(toolbarVisibility, for: .navigationBar)
+            .statusBarHidden(toolbarVisibility != .visible)
         }
     }
 }
