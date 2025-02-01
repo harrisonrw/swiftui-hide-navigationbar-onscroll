@@ -9,6 +9,7 @@ import SwiftUI
 
 struct ContentView: View {
     @State private var items: [UUID] = (1...100).compactMap { _ in UUID() }
+    @State private var isScrolling = false
     
     var body: some View {
         NavigationStack {
@@ -20,6 +21,17 @@ struct ContentView: View {
                     LazyVStack {
                         ForEach(items, id: \.self) { item in
                             ItemView(item: item)
+                        }
+                    }
+                    .scrollTargetLayout()
+                }
+                .onScrollPhaseChange{ _, newPhase in
+                    withAnimation {
+                        switch newPhase {
+                        case .idle:
+                            isScrolling = false
+                        case .tracking, .interacting, .decelerating, .animating:
+                            isScrolling = true
                         }
                     }
                 }
@@ -53,6 +65,7 @@ struct ContentView: View {
                     }
                 }
             }
+            .toolbarVisibility(isScrolling ? .hidden : .visible, for: .navigationBar)
         }
     }
 }
